@@ -1,0 +1,14 @@
+:root {
+  --white: #ffffff;
+  --light-gray: #d7dadc;
+  --black: #1a1a1b;
+  --orange: #ff6314;
+  --dark-orange: #e65811;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--black);
+  color: var(--light-gray);
+}
