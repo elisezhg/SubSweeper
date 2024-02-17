@@ -4,7 +4,11 @@ import classNames from 'classnames';
 export function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { className, children, ...passthroughs } = props;
   return (
-    <button className={classNames('button', className)} {...passthroughs}>
+    <button
+      className={classNames('button', className)}
+      tabIndex={0}
+      {...passthroughs}
+    >
       {children}
     </button>
   );
