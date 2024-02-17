@@ -8,7 +8,7 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
 }
 
-export function Checkbox(props: CheckboxProps) {
+export default function Checkbox(props: CheckboxProps) {
   const { className, id, name, value, label } = props;
   return (
     <label htmlFor={id} className={classNames('checkbox', className)}>
