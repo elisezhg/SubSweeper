@@ -1,12 +1,12 @@
 :root {
-  --black: #1a1a1b;
+  --black: #1a1a1a;
   --white: #ffffff;
   --gray: #ccc;
   --light-gray: #d7dadc;
-  --dark-gray: #222224;
+  --dark-gray: #242424;
   --orange: #ff4500;
   --dark-orange: #ef4102;
-  --blue: #4fbcff;
+  --blue: #3ea5e6;
 }
 
 body {
@@ -14,4 +14,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: var(--black);
   color: var(--light-gray);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }

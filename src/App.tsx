@@ -24,10 +24,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
+    <div className='main-container'>
       <h1>SubSweeper 🧹</h1>
       <RouterProvider router={router} />
-    </>
+    </div>
   );
 }
 
