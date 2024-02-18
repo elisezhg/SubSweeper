@@ -1,0 +1,30 @@
+.sub-manager-page {
+  .btn-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 4rem;
+
+    &__left,
+    &__right {
+      display: flex;
+      gap: 1.5rem;
+    }
+  }
+
+  .subreddits-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    &__checkbox {
+      width: 100%;
+
+      @media screen and (min-width: 768px) {
+        width: 45%;
+      }
+    }
+  }
+}
