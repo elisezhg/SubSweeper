@@ -1,9 +1,16 @@
 import axios from 'axios';
 
-const REDDIT_API_BASE_URL = 'https://oauth.reddit.com';
-
 export async function getToken(code: string) {
-  return Promise.resolve(code); // TODO
+  const data = await axios.post(
+    `${import.meta.env.VITE_SERVER_BASE_URL}/token`,
+    null,
+    {
+      params: { code: code },
+    }
+  );
+
+  console.log(data);
+  return data.data;
 }
 
 export async function getSubreddits(
@@ -28,7 +35,7 @@ export async function getSubreddits(
   }
 
   const data = await axios.get(
-    `${REDDIT_API_BASE_URL}/subreddits/mine/subscriber`,
+    `${import.meta.env.VITE_REDDIT_API_BASE_URL}/subreddits/mine/subscriber`,
     {
       params,
       headers: {
@@ -46,12 +53,16 @@ export async function postUnsubscribe(subFullNames: string[]) {
     sr: subFullNames.join(','),
   };
 
-  const data = await axios.post(`${REDDIT_API_BASE_URL}/api/subscribe`, null, {
-    params,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('ss-token')}`,
-    },
-  });
+  const data = await axios.post(
+    `${import.meta.env.VITE_REDDIT_API_BASE_URL}/api/subscribe`,
+    null,
+    {
+      params,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('ss-token')}`,
+      },
+    }
+  );
 
   return data.data;
 }

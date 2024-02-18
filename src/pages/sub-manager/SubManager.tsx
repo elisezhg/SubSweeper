@@ -34,7 +34,9 @@ export default function SubManager() {
         navigate('/login');
       } else {
         getToken(paramCode).then((res: any) => {
-          localStorage.setItem('ss-token', res.access_token);
+          if (res.access_token) {
+            localStorage.setItem('ss-token', res.access_token);
+          }
           setIsLoading(false);
           navigate('/');
         });
@@ -88,6 +90,7 @@ export default function SubManager() {
 
     postUnsubscribe(subredditsToUnsub).then((res) => {
       console.log(res.success);
+      setSubreddits(subreddits.filter((sub) => !sub.selected));
     });
   };
 
