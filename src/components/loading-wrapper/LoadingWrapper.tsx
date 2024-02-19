@@ -1,3 +1,5 @@
+import './LoadingWrapper.scss';
+
 interface LoadingWrapperProps {
   isLoading: boolean;
   children: React.ReactNode;
@@ -6,5 +8,17 @@ interface LoadingWrapperProps {
 export default function LoadingWrapper(props: LoadingWrapperProps) {
   const { isLoading, children } = props;
 
-  return <>{isLoading ? <></> : children}</>;
+  return (
+    <>
+      {isLoading ? (
+        <div className='loading-wrapper'>
+          <span className='loading-wrapper__dot'></span>
+          <span className='loading-wrapper__dot'></span>
+          <span className='loading-wrapper__dot'></span>
+        </div>
+      ) : (
+        children
+      )}
+    </>
+  );
 }
