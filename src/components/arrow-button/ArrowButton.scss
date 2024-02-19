@@ -1,0 +1,17 @@
+.arrow-button {
+  height: 100%;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    border: solid var(--light-gray);
+    border-width: 0 4px 4px 0;
+    transform: translateX(-25%) rotate(-45deg);
+  }
+
+  &--left::after {
+    transform: translateX(25%) rotate(135deg);
+  }
+}

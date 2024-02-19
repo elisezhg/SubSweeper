@@ -1,3 +1,4 @@
+import ArrowButton from '@components/arrow-button/ArrowButton';
 import Button from '@components/button/Button';
 import Checkbox from '@components/checkbox/Checkbox';
 import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
@@ -17,9 +18,11 @@ export default function SubManager() {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubredditsLoading, setIsSubredditsLoading] = useState(true);
   const [subreddits, setSubreddits] = useState([] as Subreddit[]);
   const [before, setBefore] = useState('');
   const [after, setAfter] = useState('');
+  const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
 
   useEffect(() => {
     const paramState = searchParams.get('state');
@@ -57,6 +60,8 @@ export default function SubManager() {
   }, [isLoading]);
 
   const fetchSubreddits = (before: string = '', after: string = '') => {
+    setIsSubredditsLoading(true);
+
     getSubreddits(before, after).then((res) => {
       setBefore(res.data.before);
       setAfter(res.data.after);
@@ -72,25 +77,43 @@ export default function SubManager() {
           )
         )
       );
+      setIsSubredditsLoading(false);
     });
   };
 
   const toggleAllSelections = (selected: boolean) => {
-    const updatedSubreddits = subreddits.map((s: Subreddit) => ({
-      ...s,
-      selected: selected,
-    }));
-    setSubreddits(updatedSubreddits);
+    if (selected) {
+      setSelectedSubreddits((prevSelectedSubreddits) => [
+        ...prevSelectedSubreddits,
+        ...subreddits
+          .filter(
+            (s: Subreddit) => prevSelectedSubreddits.indexOf(s.fullName) === -1
+          )
+          .map((s) => s.fullName),
+      ]);
+    } else {
+      const toBeRemoved = subreddits.map((s) => s.fullName);
+      setSelectedSubreddits((prevSelectedSubreddits) =>
+        prevSelectedSubreddits.filter(
+          (s: string) => toBeRemoved.indexOf(s) === -1
+        )
+      );
+    }
+  };
+
+  const resetSelection = () => {
+    setSelectedSubreddits([]);
   };
 
   const handleUnsubscribe = () => {
-    const subredditsToUnsub = subreddits
-      .filter((sub) => sub.selected)
-      .map((sub) => sub.fullName);
-
-    postUnsubscribe(subredditsToUnsub).then((res) => {
+    postUnsubscribe(selectedSubreddits).then((res) => {
       console.log(res.success);
-      setSubreddits(subreddits.filter((sub) => !sub.selected));
+      setSubreddits(
+        subreddits.filter(
+          (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
+        )
+      );
+      setSelectedSubreddits([]);
     });
   };
 
@@ -98,42 +121,72 @@ export default function SubManager() {
     <LoadingWrapper isLoading={isLoading}>
       <div className='sub-manager-page'>
         <div className='btn-container'>
-          <div className='btn-container__left'>
-            <Button onClick={() => toggleAllSelections(false)}>
-              Unselect all
-            </Button>
+          <div className='btn-container__actions'>
             <Button onClick={() => toggleAllSelections(true)}>
-              Select all
+              Select visible
+            </Button>
+            <Button onClick={() => toggleAllSelections(false)}>
+              Unselect visible
             </Button>
             <Button onClick={handleUnsubscribe}>Unsubscribe</Button>
           </div>
-          <div className='btn-container__right'>
-            <Button onClick={() => fetchSubreddits(before)}>Previous</Button>
-            <Button onClick={() => fetchSubreddits('', after)}>Next</Button>
+          <div className='btn-container__pagination'>
+            {/* TODO */}
+            <span>1-100 of 600</span>
+            <ArrowButton
+              direction='left'
+              onClick={() => fetchSubreddits(before)}
+            />
+            <ArrowButton
+              direction='right'
+              onClick={() => fetchSubreddits('', after)}
+            />
           </div>
         </div>
 
-        <div className='subreddits-container'>
-          {subreddits?.map((sub: Subreddit, idx: number) => (
-            <Checkbox
-              key={idx}
-              checked={sub.selected}
-              className='subreddits-container__checkbox'
-              id={sub.fullName}
-              name='subreddits'
-              value={sub.fullName}
-              label={sub.displayName}
-              onClick={() => {
-                const updatedSubreddits = subreddits.map((s: Subreddit) =>
-                  s.fullName == sub.fullName
-                    ? { ...s, selected: !s.selected }
-                    : s
-                );
-                setSubreddits(updatedSubreddits);
-              }}
-            />
-          ))}
+        <div className='nb-selected'>
+          <span>
+            {`${selectedSubreddits.length} subreddit${
+              selectedSubreddits.length > 1 ? 's' : ''
+            } selected`}
+          </span>
+          <button
+            className='nb-selected__reset-btn'
+            tabIndex={0}
+            onClick={resetSelection}
+          >
+            Reset
+          </button>
         </div>
+
+        <LoadingWrapper isLoading={isSubredditsLoading}>
+          <div className='subreddits-container'>
+            {subreddits?.map((sub: Subreddit, idx: number) => (
+              <Checkbox
+                key={idx}
+                checked={selectedSubreddits.indexOf(sub.fullName) !== -1}
+                className='subreddits-container__checkbox'
+                id={sub.fullName}
+                name='subreddits'
+                value={sub.fullName}
+                label={sub.displayName}
+                onClick={() => {
+                  const idx = selectedSubreddits.indexOf(sub.fullName);
+                  if (idx === -1) {
+                    setSelectedSubreddits([
+                      ...selectedSubreddits,
+                      sub.fullName,
+                    ]);
+                  } else {
+                    const updatedSelectedSubs = [...selectedSubreddits];
+                    updatedSelectedSubs.splice(idx, 1);
+                    setSelectedSubreddits(updatedSelectedSubs);
+                  }
+                }}
+              />
+            ))}
+          </div>
+        </LoadingWrapper>
       </div>
     </LoadingWrapper>
   );

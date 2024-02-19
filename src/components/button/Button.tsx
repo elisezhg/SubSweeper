@@ -1,11 +1,11 @@
 import './Button.scss';
 import classNames from 'classnames';
 
-interface ButtonProps {
+export interface ButtonProps {
   className?: string;
   onClick?: () => void;
   href?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   buttonType?: 'a' | 'button';
 }
 
