@@ -6,27 +6,37 @@
   width: calc(100% - 3rem);
   color: var(--dark-gray);
 
-  &::before,
-  &::after {
+  --close-btn-size: 16px;
+
+  &__close-btn {
+    position: absolute;
+    width: var(--close-btn-size);
+    height: var(--close-btn-size);
+    top: 0;
+    right: 0;
+    margin: 1rem;
+  }
+
+  &__close-btn::before,
+  &__close-btn::after {
     position: absolute;
     content: '';
     width: 2px;
-    height: 16px;
+    height: var(--close-btn-size);
     top: 0;
     right: 0;
-    margin: 1rem 1.5rem;
     background: var(--dark-gray);
   }
 
-  &::before {
-    transform: rotate(45deg);
-  }
-  &::after {
-    transform: rotate(-45deg);
+  &__close-btn::before {
+    transform: translateX(-7px) rotate(45deg);
   }
 
-  &:hover::before,
-  &:hover::after {
+  &__close-btn::after {
+    transform: translateX(-7px) rotate(-45deg);
+  }
+
+  &__close-btn:hover {
     cursor: pointer;
   }
 
