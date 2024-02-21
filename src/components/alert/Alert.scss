@@ -5,6 +5,7 @@
   border-radius: 12px;
   width: calc(100% - 3rem);
   color: var(--dark-gray);
+  pointer-events: auto;
 
   --close-btn-size: 16px;
 

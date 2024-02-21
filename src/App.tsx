@@ -1,3 +1,5 @@
+import AlertsContainer from '@components/alerts-container/AlertsContainer';
+import { AlertsProvider } from '@contexts/AlertsProvider';
 import Login from '@pages/login/Login';
 import SubManager from '@pages/sub-manager/SubManager';
 import {
@@ -24,10 +26,13 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div className='main-container'>
-      <h1>SubSweeper 🧹</h1>
-      <RouterProvider router={router} />
-    </div>
+    <AlertsProvider>
+      <AlertsContainer />
+      <div className='main-container'>
+        <h1>SubSweeper 🧹</h1>
+        <RouterProvider router={router} />
+      </div>
+    </AlertsProvider>
   );
 }
 

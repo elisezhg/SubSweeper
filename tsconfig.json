@@ -26,6 +26,7 @@
       "@pages/*": ["./pages/*"],
       "@utils/*": ["./utils/*"],
       "@providers/*": ["./providers/*"],
+      "@contexts/*": ["./contexts/*"],
     }
   },
   "include": ["src"],

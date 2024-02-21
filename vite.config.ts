@@ -10,6 +10,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, './src/pages'),
       '@utils': path.resolve(__dirname, './src/utils'),
       '@providers': path.resolve(__dirname, './src/providers'),
+      '@contexts': path.resolve(__dirname, './src/contexts'),
     },
   },
 
