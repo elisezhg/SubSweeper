@@ -2,6 +2,7 @@ import ArrowButton from '@components/arrow-button/ArrowButton';
 import Button from '@components/button/Button';
 import Checkbox from '@components/checkbox/Checkbox';
 import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
+import useInterceptors from '@hooks/useInterceptors';
 import { getSubreddits, getToken, postUnsubscribe } from '@providers/api';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -16,6 +17,7 @@ interface Subreddit {
 export default function SubManager() {
   const [searchParams, _] = useSearchParams();
   const navigate = useNavigate();
+  useInterceptors();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubredditsLoading, setIsSubredditsLoading] = useState(true);
