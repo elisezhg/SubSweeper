@@ -2,6 +2,7 @@ import ArrowButton from '@components/arrow-button/ArrowButton';
 import Button from '@components/button/Button';
 import Checkbox from '@components/checkbox/Checkbox';
 import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
+import { useAlerts } from '@contexts/AlertsContext';
 import useInterceptors from '@hooks/useInterceptors';
 import { getSubreddits, getToken, postUnsubscribe } from '@providers/api';
 import { useEffect, useState } from 'react';
@@ -17,6 +18,7 @@ interface Subreddit {
 export default function SubManager() {
   const [searchParams, _] = useSearchParams();
   const navigate = useNavigate();
+
   useInterceptors();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +27,8 @@ export default function SubManager() {
   const [before, setBefore] = useState('');
   const [after, setAfter] = useState('');
   const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
+
+  const { pushAlert } = useAlerts();
 
   useEffect(() => {
     const paramState = searchParams.get('state');
@@ -108,8 +112,16 @@ export default function SubManager() {
   };
 
   const handleUnsubscribe = () => {
+    // TODO: error alert
     postUnsubscribe(selectedSubreddits).then((res) => {
       console.log(res.success);
+      pushAlert({
+        type: 'success',
+        message: `Successfully unsubscribed from ${
+          selectedSubreddits.length
+        } subreddit${selectedSubreddits.length > 1 ? 's' : ''}`,
+        isDisplayed: true,
+      });
       setSubreddits(
         subreddits.filter(
           (sub) => selectedSubreddits.indexOf(sub.fullName) === -1

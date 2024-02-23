@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { Alert, AlertsContext } from './AlertsContext';
 
 interface AlertsProviderProps {
@@ -8,12 +9,25 @@ interface AlertsProviderProps {
 export const AlertsProvider = ({ children }: AlertsProviderProps) => {
   const [alerts, setAlerts] = useState([] as Alert[]);
 
+  // TODO: add pushSuccessAlert and pushErrorAlert
+
   const pushAlert = (alert: Alert) => {
-    setAlerts((alerts) => [...alerts, alert]);
+    const alertWithId = { ...alert, id: uuidv4() };
+    setAlerts((alerts) => [...alerts, alertWithId]);
+    setTimeout(() => removeAlert(alert), 3000);
   };
 
   const removeAlert = (alert: Alert) => {
-    setAlerts((alerts) => alerts.filter((a) => a !== alert));
+    const alertToBeRemoved = {
+      ...alert,
+      isDisplayed: false,
+    };
+    setAlerts((alerts) =>
+      alerts.map((a) => (a === alert ? alertToBeRemoved : a))
+    );
+    setTimeout(() => {
+      setAlerts((alerts) => alerts.filter((a) => a !== alertToBeRemoved));
+    }, 300);
   };
 
   return (

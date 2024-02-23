@@ -4,6 +4,8 @@ import { createContext, useContext } from 'react';
 export interface Alert {
   type: AlertType;
   message: string;
+  isDisplayed: boolean;
+  id?: string;
 }
 
 interface AlertsContext {
