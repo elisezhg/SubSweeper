@@ -28,7 +28,7 @@ export default function SubManager() {
   const [after, setAfter] = useState('');
   const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
 
-  const { pushAlert } = useAlerts();
+  const { pushSuccessAlert, pushErrorAlert } = useAlerts();
 
   useEffect(() => {
     const paramState = searchParams.get('state');
@@ -112,23 +112,28 @@ export default function SubManager() {
   };
 
   const handleUnsubscribe = () => {
-    // TODO: error alert
-    postUnsubscribe(selectedSubreddits).then((res) => {
-      console.log(res.success);
-      pushAlert({
-        type: 'success',
-        message: `Successfully unsubscribed from ${
-          selectedSubreddits.length
-        } subreddit${selectedSubreddits.length > 1 ? 's' : ''}`,
-        isDisplayed: true,
+    postUnsubscribe(selectedSubreddits)
+      .then(() => {
+        pushSuccessAlert(
+          `Successfully unsubscribed from ${
+            selectedSubreddits.length
+          } subreddit${selectedSubreddits.length > 1 ? 's' : ''}.`
+        );
+        setSubreddits(
+          subreddits.filter(
+            (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
+          )
+        );
+        setSelectedSubreddits([]);
+      })
+      .catch((err) => {
+        if (err !== 'Unauthorized') {
+          console.error(err);
+          pushErrorAlert(
+            `Uh oh... An error occured while trying to unsubscribe.`
+          );
+        }
       });
-      setSubreddits(
-        subreddits.filter(
-          (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
-        )
-      );
-      setSelectedSubreddits([]);
-    });
   };
 
   return (

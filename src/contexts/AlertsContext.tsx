@@ -8,10 +8,15 @@ export interface Alert {
   id?: string;
 }
 
+export interface AlertsType {
+  [key: string]: Alert;
+}
+
 interface AlertsContext {
-  alerts: Alert[];
-  pushAlert: (alert: Alert) => void;
-  removeAlert: (alert: Alert) => void;
+  alerts: AlertsType;
+  pushSuccessAlert: (message: string) => void;
+  pushErrorAlert: (message: string) => void;
+  removeAlert: (alertId: string) => void;
 }
 
 export const AlertsContext = createContext({} as AlertsContext);

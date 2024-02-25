@@ -10,14 +10,14 @@ export default function AlertsContainer() {
     <>
       {createPortal(
         <div className='alerts-container'>
-          {alerts.map((alert) => (
+          {Object.keys(alerts).map((alertId) => (
             <Alert
-              key={alert.id}
-              type={alert.type}
-              isDisplayed={alert.isDisplayed}
-              onClose={() => removeAlert(alert)}
+              key={alertId}
+              type={alerts[alertId].type}
+              isDisplayed={alerts[alertId].isDisplayed}
+              onClose={() => removeAlert(alertId)}
             >
-              {alert.message}
+              {alerts[alertId].message}
             </Alert>
           ))}
         </div>,

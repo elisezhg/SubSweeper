@@ -1,37 +1,63 @@
-import { useState } from 'react';
+import { AlertType } from '@components/alert/Alert';
+import { useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Alert, AlertsContext } from './AlertsContext';
+import { AlertsContext, AlertsType } from './AlertsContext';
 
 interface AlertsProviderProps {
   children: React.ReactNode;
 }
 
+interface TimeoutsRef {
+  [key: string]: NodeJS.Timeout;
+}
+
 export const AlertsProvider = ({ children }: AlertsProviderProps) => {
-  const [alerts, setAlerts] = useState([] as Alert[]);
+  const [alerts, setAlerts] = useState({} as AlertsType);
+  const timeoutsRef = useRef({} as TimeoutsRef);
 
-  // TODO: add pushSuccessAlert and pushErrorAlert
+  const pushAlert = (type: AlertType, message: string) => {
+    const newAlert = { type, message, isDisplayed: true };
+    const newAlertId = uuidv4();
 
-  const pushAlert = (alert: Alert) => {
-    const alertWithId = { ...alert, id: uuidv4() };
-    setAlerts((alerts) => [...alerts, alertWithId]);
-    setTimeout(() => removeAlert(alert), 3000);
+    setAlerts((alerts) => ({
+      ...alerts,
+      [newAlertId]: newAlert,
+    }));
+
+    timeoutsRef.current[newAlertId] = setTimeout(() => {
+      removeAlert(newAlertId);
+    }, 3000);
   };
 
-  const removeAlert = (alert: Alert) => {
-    const alertToBeRemoved = {
-      ...alert,
-      isDisplayed: false,
-    };
-    setAlerts((alerts) =>
-      alerts.map((a) => (a === alert ? alertToBeRemoved : a))
-    );
+  const pushSuccessAlert = (message: string) => {
+    pushAlert('success', message);
+  };
+
+  const pushErrorAlert = (message: string) => {
+    pushAlert('error', message);
+  };
+
+  const removeAlert = (alertId: string) => {
+    setAlerts((alerts) => {
+      const updatedAlerts = { ...alerts };
+      updatedAlerts[alertId].isDisplayed = false;
+      return updatedAlerts;
+    });
+
     setTimeout(() => {
-      setAlerts((alerts) => alerts.filter((a) => a !== alertToBeRemoved));
+      setAlerts((alerts) => {
+        const { [alertId]: alertToRemove, ...restAlerts } = alerts;
+        return restAlerts;
+      });
     }, 300);
+
+    clearTimeout(timeoutsRef.current[alertId]);
   };
 
   return (
-    <AlertsContext.Provider value={{ alerts, pushAlert, removeAlert }}>
+    <AlertsContext.Provider
+      value={{ alerts, pushSuccessAlert, pushErrorAlert, removeAlert }}
+    >
       {children}
     </AlertsContext.Provider>
   );
