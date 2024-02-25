@@ -27,7 +27,7 @@
       "@utils/*": ["./utils/*"],
       "@providers/*": ["./providers/*"],
       "@contexts/*": ["./contexts/*"],
-      "@hooks/*": ["./hooks/*"],
+      "@hooks/*": ["./hooks/*"]
     }
   },
   "include": ["src"],

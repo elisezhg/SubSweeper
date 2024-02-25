@@ -8,7 +8,7 @@ interface AlertsProviderProps {
 }
 
 interface TimeoutsRef {
-  [key: string]: NodeJS.Timeout;
+  [key: string]: number;
 }
 
 export const AlertsProvider = ({ children }: AlertsProviderProps) => {
@@ -24,7 +24,7 @@ export const AlertsProvider = ({ children }: AlertsProviderProps) => {
       [newAlertId]: newAlert,
     }));
 
-    timeoutsRef.current[newAlertId] = setTimeout(() => {
+    timeoutsRef.current[newAlertId] = window.setTimeout(() => {
       removeAlert(newAlertId);
     }, 3000);
   };
@@ -44,14 +44,14 @@ export const AlertsProvider = ({ children }: AlertsProviderProps) => {
       return updatedAlerts;
     });
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       setAlerts((alerts) => {
         const { [alertId]: alertToRemove, ...restAlerts } = alerts;
         return restAlerts;
       });
     }, 300);
 
-    clearTimeout(timeoutsRef.current[alertId]);
+    window.clearTimeout(timeoutsRef.current[alertId]);
   };
 
   return (
