@@ -1,3 +1,4 @@
+import { SUBREDDITS_PAGE_SIZE } from '@utils/constants';
 import axios from 'axios';
 
 export async function getToken(code: string) {
@@ -9,55 +10,46 @@ export async function getToken(code: string) {
     }
   );
 
-  console.log(data);
   return data.data;
 }
 
-export async function getSubreddits(
-  before?: string,
-  after?: string,
-  count?: number
-) {
-  const params = {
-    limit: 100,
-  } as any;
+export async function getSubreddits() {
+  let seen = 0;
+  let after = null;
+  let subreddits: any[] = [];
 
-  if (before) {
-    params.before = before;
-  }
+  do {
+    const res = (await axios.get(
+      `${import.meta.env.VITE_REDDIT_API_BASE_URL}/subreddits/mine/subscriber`,
+      {
+        params: {
+          limit: SUBREDDITS_PAGE_SIZE,
+          count: seen,
+          after: after,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('ss-token')}`,
+        },
+      }
+    )) as any;
 
-  if (after) {
-    params.after = after;
-  }
+    after = res.data.data.after;
+    seen += res.data.data.children.length;
+    subreddits = subreddits.concat(res.data.data.children);
+  } while (after);
 
-  if (count) {
-    params.count = count;
-  }
-
-  const data = await axios.get(
-    `${import.meta.env.VITE_REDDIT_API_BASE_URL}/subreddits/mine/subscriber`,
-    {
-      params,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('ss-token')}`,
-      },
-    }
-  );
-
-  return data.data;
+  return Promise.resolve(subreddits);
 }
 
 export async function postUnsubscribe(subFullNames: string[]) {
-  const params = {
-    action: 'unsub',
-    sr: subFullNames.join(','),
-  };
-
   const data = await axios.post(
     `${import.meta.env.VITE_REDDIT_API_BASE_URL}/api/subscribe`,
     null,
     {
-      params,
+      params: {
+        action: 'unsub',
+        sr: subFullNames.join(','),
+      },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('ss-token')}`,
       },

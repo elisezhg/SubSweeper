@@ -5,7 +5,8 @@ import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
 import { useAlerts } from '@contexts/AlertsContext';
 import useInterceptors from '@hooks/useInterceptors';
 import { getSubreddits, getToken, postUnsubscribe } from '@providers/api';
-import { useEffect, useState } from 'react';
+import { SUBREDDITS_PAGE_SIZE } from '@utils/constants';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './SubManager.scss';
 
@@ -24,11 +25,17 @@ export default function SubManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubredditsLoading, setIsSubredditsLoading] = useState(true);
   const [subreddits, setSubreddits] = useState([] as Subreddit[]);
-  const [before, setBefore] = useState('');
-  const [after, setAfter] = useState('');
   const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
+  const [pageNumber, setPageNumber] = useState(0);
 
   const { pushSuccessAlert, pushErrorAlert } = useAlerts();
+
+  const pageStart = pageNumber * SUBREDDITS_PAGE_SIZE;
+  const pageEnd = (pageNumber + 1) * SUBREDDITS_PAGE_SIZE - 1;
+  const visibleSubreddits = useMemo(
+    () => subreddits?.slice(pageStart, pageEnd + 1),
+    [subreddits, pageNumber]
+  );
 
   useEffect(() => {
     const paramState = searchParams.get('state');
@@ -65,15 +72,13 @@ export default function SubManager() {
     }
   }, [isLoading]);
 
-  const fetchSubreddits = (before: string = '', after: string = '') => {
+  const fetchSubreddits = () => {
     setIsSubredditsLoading(true);
 
-    getSubreddits(before, after).then((res) => {
-      setBefore(res.data.before);
-      setAfter(res.data.after);
+    getSubreddits().then((res) => {
       setSubreddits(
         Array.from(
-          res.data.children.map(
+          res.map(
             (sub: any) =>
               ({
                 selected: false,
@@ -91,14 +96,14 @@ export default function SubManager() {
     if (selected) {
       setSelectedSubreddits((prevSelectedSubreddits) => [
         ...prevSelectedSubreddits,
-        ...subreddits
+        ...visibleSubreddits
           .filter(
             (s: Subreddit) => prevSelectedSubreddits.indexOf(s.fullName) === -1
           )
           .map((s) => s.fullName),
       ]);
     } else {
-      const toBeRemoved = subreddits.map((s) => s.fullName);
+      const toBeRemoved = visibleSubreddits.map((s) => s.fullName);
       setSelectedSubreddits((prevSelectedSubreddits) =>
         prevSelectedSubreddits.filter(
           (s: string) => toBeRemoved.indexOf(s) === -1
@@ -136,6 +141,15 @@ export default function SubManager() {
       });
   };
 
+  const handlePageChange = (newPageNumber: number) => {
+    const lowerBound = 0;
+    const upperBound = subreddits.length / SUBREDDITS_PAGE_SIZE;
+
+    if (newPageNumber >= lowerBound && newPageNumber < upperBound) {
+      setPageNumber(newPageNumber);
+    }
+  };
+
   return (
     <LoadingWrapper isLoading={isLoading}>
       <div className='sub-manager-page'>
@@ -149,18 +163,23 @@ export default function SubManager() {
             </Button>
             <Button onClick={handleUnsubscribe}>Unsubscribe</Button>
           </div>
-          <div className='btn-container__pagination'>
-            {/* TODO */}
-            <span>1-100 of 600</span>
-            <ArrowButton
-              direction='left'
-              onClick={() => fetchSubreddits(before)}
-            />
-            <ArrowButton
-              direction='right'
-              onClick={() => fetchSubreddits('', after)}
-            />
-          </div>
+
+          {subreddits?.length > SUBREDDITS_PAGE_SIZE && (
+            <div className='btn-container__pagination'>
+              <span>
+                {pageStart + 1}-{Math.min(pageEnd + 1, subreddits.length)} of{' '}
+                {subreddits.length}
+              </span>
+              <ArrowButton
+                direction='left'
+                onClick={() => handlePageChange(pageNumber - 1)}
+              />
+              <ArrowButton
+                direction='right'
+                onClick={() => handlePageChange(pageNumber + 1)}
+              />
+            </div>
+          )}
         </div>
 
         <div className='nb-selected'>
@@ -180,7 +199,7 @@ export default function SubManager() {
 
         <LoadingWrapper isLoading={isSubredditsLoading}>
           <div className='subreddits-container'>
-            {subreddits?.map((sub: Subreddit, idx: number) => (
+            {visibleSubreddits.map((sub: Subreddit, idx: number) => (
               <Checkbox
                 key={idx}
                 checked={selectedSubreddits.indexOf(sub.fullName) !== -1}
