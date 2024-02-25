@@ -92,28 +92,24 @@ export default function SubManager() {
     });
   };
 
-  const toggleAllSelections = (selected: boolean) => {
-    if (selected) {
-      setSelectedSubreddits((prevSelectedSubreddits) => [
-        ...prevSelectedSubreddits,
-        ...visibleSubreddits
-          .filter(
-            (s: Subreddit) => prevSelectedSubreddits.indexOf(s.fullName) === -1
-          )
-          .map((s) => s.fullName),
-      ]);
-    } else {
-      const toBeRemoved = visibleSubreddits.map((s) => s.fullName);
-      setSelectedSubreddits((prevSelectedSubreddits) =>
-        prevSelectedSubreddits.filter(
-          (s: string) => toBeRemoved.indexOf(s) === -1
+  const handleSelectVisible = () => {
+    setSelectedSubreddits((prevSelectedSubreddits) => [
+      ...prevSelectedSubreddits,
+      ...visibleSubreddits
+        .filter(
+          (s: Subreddit) => prevSelectedSubreddits.indexOf(s.fullName) === -1
         )
-      );
-    }
+        .map((s) => s.fullName),
+    ]);
   };
 
-  const resetSelection = () => {
-    setSelectedSubreddits([]);
+  const handleUnselectVisible = () => {
+    const toBeRemoved = visibleSubreddits.map((s) => s.fullName);
+    setSelectedSubreddits((prevSelectedSubreddits) =>
+      prevSelectedSubreddits.filter(
+        (s: string) => toBeRemoved.indexOf(s) === -1
+      )
+    );
   };
 
   const handleUnsubscribe = () => {
@@ -124,12 +120,18 @@ export default function SubManager() {
             selectedSubreddits.length
           } subreddit${selectedSubreddits.length > 1 ? 's' : ''}.`
         );
-        setSubreddits(
-          subreddits.filter(
-            (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
-          )
+
+        const updatedSubreddits = subreddits.filter(
+          (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
         );
+        setSubreddits(updatedSubreddits);
         setSelectedSubreddits([]);
+
+        // Decrease page number if needed
+        const totalPages = updatedSubreddits.length / SUBREDDITS_PAGE_SIZE;
+        if (pageNumber >= totalPages) {
+          setPageNumber(pageNumber - 1);
+        }
       })
       .catch((err) => {
         if (err !== 'Unauthorized') {
@@ -155,12 +157,8 @@ export default function SubManager() {
       <div className='sub-manager-page'>
         <div className='btn-container'>
           <div className='btn-container__actions'>
-            <Button onClick={() => toggleAllSelections(true)}>
-              Select visible
-            </Button>
-            <Button onClick={() => toggleAllSelections(false)}>
-              Unselect visible
-            </Button>
+            <Button onClick={handleSelectVisible}>Select visible</Button>
+            <Button onClick={handleUnselectVisible}>Unselect visible</Button>
             <Button onClick={handleUnsubscribe}>Unsubscribe</Button>
           </div>
 
@@ -184,14 +182,13 @@ export default function SubManager() {
 
         <div className='nb-selected'>
           <span>
-            {`${selectedSubreddits.length} subreddit${
-              selectedSubreddits.length > 1 ? 's' : ''
-            } selected`}
+            {selectedSubreddits.length} subreddit
+            {selectedSubreddits.length > 1 ? 's' : ''} selected
           </span>
           <button
             className='nb-selected__reset-btn'
             tabIndex={0}
-            onClick={resetSelection}
+            onClick={() => setSelectedSubreddits([])}
           >
             Reset
           </button>
