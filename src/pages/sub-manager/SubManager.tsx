@@ -30,8 +30,12 @@ export default function SubManager() {
 
   const { pushSuccessAlert, pushErrorAlert } = useAlerts();
 
+  const lowerBound = 0;
+  const upperBound = subreddits.length / SUBREDDITS_PAGE_SIZE - 1;
+
   const pageStart = pageNumber * SUBREDDITS_PAGE_SIZE;
   const pageEnd = (pageNumber + 1) * SUBREDDITS_PAGE_SIZE - 1;
+
   const visibleSubreddits = useMemo(
     () => subreddits?.slice(pageStart, pageEnd + 1),
     [subreddits, pageNumber]
@@ -115,12 +119,6 @@ export default function SubManager() {
   const handleUnsubscribe = () => {
     postUnsubscribe(selectedSubreddits)
       .then(() => {
-        pushSuccessAlert(
-          `Successfully unsubscribed from ${
-            selectedSubreddits.length
-          } subreddit${selectedSubreddits.length > 1 ? 's' : ''}.`
-        );
-
         const updatedSubreddits = subreddits.filter(
           (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
         );
@@ -132,6 +130,12 @@ export default function SubManager() {
         if (pageNumber >= totalPages) {
           setPageNumber(pageNumber - 1);
         }
+
+        pushSuccessAlert(
+          `Successfully unsubscribed from ${
+            selectedSubreddits.length
+          } subreddit${selectedSubreddits.length > 1 ? 's' : ''}.`
+        );
       })
       .catch((err) => {
         if (err !== 'Unauthorized') {
@@ -144,10 +148,7 @@ export default function SubManager() {
   };
 
   const handlePageChange = (newPageNumber: number) => {
-    const lowerBound = 0;
-    const upperBound = subreddits.length / SUBREDDITS_PAGE_SIZE;
-
-    if (newPageNumber >= lowerBound && newPageNumber < upperBound) {
+    if (newPageNumber >= lowerBound && newPageNumber <= upperBound) {
       setPageNumber(newPageNumber);
     }
   };
@@ -159,7 +160,12 @@ export default function SubManager() {
           <div className='btn-container__actions'>
             <Button onClick={handleSelectVisible}>Select visible</Button>
             <Button onClick={handleUnselectVisible}>Unselect visible</Button>
-            <Button onClick={handleUnsubscribe}>Unsubscribe</Button>
+            <Button
+              onClick={handleUnsubscribe}
+              disabled={selectedSubreddits.length == 0}
+            >
+              Unsubscribe
+            </Button>
           </div>
 
           {subreddits?.length > SUBREDDITS_PAGE_SIZE && (
@@ -170,10 +176,12 @@ export default function SubManager() {
               </span>
               <ArrowButton
                 direction='left'
+                disabled={pageNumber == lowerBound}
                 onClick={() => handlePageChange(pageNumber - 1)}
               />
               <ArrowButton
                 direction='right'
+                disabled={pageNumber == upperBound}
                 onClick={() => handlePageChange(pageNumber + 1)}
               />
             </div>
