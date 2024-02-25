@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 
@@ -29,8 +29,9 @@ app.post('/token', (req, res, next) => {
       }
     )
     .then((data) => res.send(data.data))
-    .catch(err => {
-      console.log(err);
+    .catch((err) => {
+      console.error(err.response.data);
+      res.status(err.response.status).send(err);
     });
 });
 
