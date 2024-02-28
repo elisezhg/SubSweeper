@@ -9,20 +9,25 @@ import {
 } from 'react-router-dom';
 import './App.scss';
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <SubManager />,
+    },
+    {
+      path: '/login',
+      element: <Login />,
+    },
+    {
+      path: '*',
+      element: <Navigate to='/' replace />,
+    },
+  ],
   {
-    path: '/',
-    element: <SubManager />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '*',
-    element: <Navigate to='/' replace />,
-  },
-]);
+    basename: import.meta.env.BASE_URL,
+  }
+);
 
 function App() {
   return (
