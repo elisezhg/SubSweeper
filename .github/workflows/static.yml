@@ -41,10 +41,10 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_CLIENT_ID: ${{ secrets.VITE_CLIENT_ID }}
-          VITE_REDDIT_API_BASE_URL: ${{ secrets.VITE_REDDIT_API_BASE_URL }}
-          VITE_SERVER_BASE_URL: ${{ secrets.VITE_SERVER_BASE_URL }}
-          VITE_REDIRECT_URI: ${{ secrets.VITE_REDIRECT_URI }}
+          VITE_CLIENT_ID: ${{ vars.VITE_CLIENT_ID }}
+          VITE_REDDIT_API_BASE_URL: ${{ vars.VITE_REDDIT_API_BASE_URL }}
+          VITE_SERVER_BASE_URL: ${{ vars.VITE_SERVER_BASE_URL }}
+          VITE_REDIRECT_URI: ${{ vars.VITE_REDIRECT_URI }}
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
