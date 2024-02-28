@@ -31,7 +31,7 @@ export default function SubManager() {
   const { pushSuccessAlert, pushErrorAlert } = useAlerts();
 
   const lowerBound = 0;
-  const upperBound = subreddits.length / SUBREDDITS_PAGE_SIZE - 1;
+  const upperBound = Math.ceil(subreddits.length / SUBREDDITS_PAGE_SIZE - 1);
 
   const pageStart = pageNumber * SUBREDDITS_PAGE_SIZE;
   const pageEnd = (pageNumber + 1) * SUBREDDITS_PAGE_SIZE - 1;
