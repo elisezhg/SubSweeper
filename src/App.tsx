@@ -34,7 +34,7 @@ function App() {
     <AlertsProvider>
       <AlertsContainer />
       <div className='main-container'>
-        <h1>SubSweeper 🧹</h1>
+        <h1>SubSweeper</h1>
         <RouterProvider router={router} />
       </div>
     </AlertsProvider>

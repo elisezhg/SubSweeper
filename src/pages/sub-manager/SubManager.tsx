@@ -1,4 +1,5 @@
 import ArrowButton from '@components/arrow-button/ArrowButton';
+import BackToTop from '@components/back-to-top/BackToTop';
 import Button from '@components/button/Button';
 import Checkbox from '@components/checkbox/Checkbox';
 import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
@@ -231,6 +232,8 @@ export default function SubManager() {
           </div>
         </LoadingWrapper>
       </div>
+
+      <BackToTop />
     </LoadingWrapper>
   );
 }
