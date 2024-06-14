@@ -11,6 +11,16 @@
     background-color: var(--light-orange);
   }
 
+  &--loading {
+    min-height: 46px;
+
+    > span {
+      display: block;
+      height: 0;
+      visibility: hidden;
+    }
+  }
+
   &:not(.button--disabled):hover {
     cursor: pointer;
     background-color: var(--dark-orange);

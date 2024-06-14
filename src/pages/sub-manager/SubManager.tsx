@@ -25,6 +25,7 @@ export default function SubManager() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubredditsLoading, setIsSubredditsLoading] = useState(true);
+  const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [subreddits, setSubreddits] = useState([] as Subreddit[]);
   const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
   const [pageNumber, setPageNumber] = useState(0);
@@ -118,8 +119,12 @@ export default function SubManager() {
   };
 
   const handleUnsubscribe = () => {
+    setIsUnsubscribing(true);
+
     postUnsubscribe(selectedSubreddits)
       .then(() => {
+        setIsUnsubscribing(false);
+
         const updatedSubreddits = subreddits.filter(
           (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
         );
@@ -139,6 +144,8 @@ export default function SubManager() {
         );
       })
       .catch((err) => {
+        setIsUnsubscribing(false);
+
         if (err !== 'Unauthorized') {
           console.error(err);
           pushErrorAlert(
@@ -163,7 +170,8 @@ export default function SubManager() {
             <Button onClick={handleUnselectVisible}>Unselect visible</Button>
             <Button
               onClick={handleUnsubscribe}
-              disabled={selectedSubreddits.length == 0}
+              disabled={selectedSubreddits.length == 0 || isUnsubscribing}
+              loading={isUnsubscribing}
             >
               Unsubscribe
             </Button>

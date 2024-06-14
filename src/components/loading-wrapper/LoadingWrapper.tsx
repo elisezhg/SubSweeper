@@ -1,3 +1,4 @@
+import LoadingDots from '@components/loading-dots/LoadingDots';
 import './LoadingWrapper.scss';
 
 interface LoadingWrapperProps {
@@ -8,17 +9,5 @@ interface LoadingWrapperProps {
 export default function LoadingWrapper(props: LoadingWrapperProps) {
   const { isLoading, children } = props;
 
-  return (
-    <>
-      {isLoading ? (
-        <div className='loading-wrapper'>
-          <span className='loading-wrapper__dot'></span>
-          <span className='loading-wrapper__dot'></span>
-          <span className='loading-wrapper__dot'></span>
-        </div>
-      ) : (
-        children
-      )}
-    </>
-  );
+  return <>{isLoading ? <LoadingDots /> : children}</>;
 }
