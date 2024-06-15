@@ -131,6 +131,14 @@ export default function SubManager() {
     }
   };
 
+  const handleCheckboxChange = (e: React.BaseSyntheticEvent) => {
+    const { checked, value } = e.target;
+    const updatedSelected = checked
+      ? [...selectedSubreddits, value]
+      : selectedSubreddits.filter((s) => s !== value);
+    setSelectedSubreddits(updatedSelected);
+  };
+
   return (
     <LoadingWrapper isLoading={isLoading}>
       <div className='sub-manager-page'>
@@ -192,19 +200,7 @@ export default function SubManager() {
                 name='subreddits'
                 value={sub.fullName}
                 label={sub.displayName}
-                onClick={() => {
-                  const idx = selectedSubreddits.indexOf(sub.fullName);
-                  if (idx === -1) {
-                    setSelectedSubreddits([
-                      ...selectedSubreddits,
-                      sub.fullName,
-                    ]);
-                  } else {
-                    const updatedSelectedSubs = [...selectedSubreddits];
-                    updatedSelectedSubs.splice(idx, 1);
-                    setSelectedSubreddits(updatedSelectedSubs);
-                  }
-                }}
+                onChange={handleCheckboxChange}
               />
             ))}
           </div>
