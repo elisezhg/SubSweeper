@@ -5,17 +5,12 @@ import Checkbox from '@components/checkbox/Checkbox';
 import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
 import { useAlerts } from '@contexts/AlertsContext';
 import useInterceptors from '@hooks/useInterceptors';
-import { getSubreddits, getToken, postUnsubscribe } from '@providers/api';
+import useSubreddits, { Subreddit } from '@hooks/useSubreddits';
+import { getToken, postUnsubscribe } from '@providers/api';
 import { SUBREDDITS_PAGE_SIZE } from '@utils/constants';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './SubManager.scss';
-
-interface Subreddit {
-  selected: boolean;
-  fullName: string;
-  displayName: string;
-}
 
 export default function SubManager() {
   const [searchParams, _] = useSearchParams();
@@ -24,13 +19,14 @@ export default function SubManager() {
   useInterceptors();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubredditsLoading, setIsSubredditsLoading] = useState(true);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
-  const [subreddits, setSubreddits] = useState([] as Subreddit[]);
   const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
   const [pageNumber, setPageNumber] = useState(0);
 
   const { pushSuccessAlert, pushErrorAlert } = useAlerts();
+
+  const { isSubredditsLoading, subreddits, setAndCacheSubreddits } =
+    useSubreddits(isLoading);
 
   const lowerBound = 0;
   const upperBound = Math.ceil(subreddits.length / SUBREDDITS_PAGE_SIZE - 1);
@@ -72,32 +68,6 @@ export default function SubManager() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!isLoading) {
-      fetchSubreddits();
-    }
-  }, [isLoading]);
-
-  const fetchSubreddits = () => {
-    setIsSubredditsLoading(true);
-
-    getSubreddits().then((res) => {
-      setSubreddits(
-        Array.from(
-          res.map(
-            (sub: any) =>
-              ({
-                selected: false,
-                fullName: sub.data.name,
-                displayName: sub.data.display_name_prefixed,
-              } as Subreddit)
-          )
-        )
-      );
-      setIsSubredditsLoading(false);
-    });
-  };
-
   const handleSelectVisible = () => {
     setSelectedSubreddits((prevSelectedSubreddits) => [
       ...prevSelectedSubreddits,
@@ -128,7 +98,7 @@ export default function SubManager() {
         const updatedSubreddits = subreddits.filter(
           (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
         );
-        setSubreddits(updatedSubreddits);
+        setAndCacheSubreddits(updatedSubreddits);
         setSelectedSubreddits([]);
 
         // Decrease page number if needed
