@@ -7,7 +7,6 @@ export default function useLoggedIn() {
 
   useEffect(() => {
     const updateStatus = () => {
-      console.log('updating status to', getStatus());
       setIsLoggedIn(getStatus());
     };
     window.addEventListener('storage', updateStatus);
