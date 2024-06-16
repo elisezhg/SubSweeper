@@ -20,8 +20,8 @@ export const AlertsProvider = ({ children }: AlertsProviderProps) => {
     const newAlertId = uuidv4();
 
     setAlerts((alerts) => ({
-      ...alerts,
       [newAlertId]: newAlert,
+      ...alerts,
     }));
 
     timeoutsRef.current[newAlertId] = window.setTimeout(() => {

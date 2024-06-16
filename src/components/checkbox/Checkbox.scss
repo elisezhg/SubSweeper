@@ -1,13 +1,13 @@
 .checkbox {
-  --chekcmark-size: 24px;
+  --checkmark-size: 24px;
 
   display: flex;
   align-items: center;
   background-color: var(--black);
   position: relative;
-  padding-left: calc(var(--chekcmark-size) * 2.8);
-  padding-right: 16px;
-  min-height: calc(var(--chekcmark-size) * 2 + 8px);
+  padding-right: calc(var(--checkmark-size) * 2 + 16px);
+  padding-left: calc(var(--checkmark-size));
+  min-height: calc(var(--checkmark-size) * 2 + 16px);
   font-size: 1.2rem;
   border-radius: 24px;
   border: 2px solid var(--light-gray);
@@ -22,12 +22,30 @@
     width: 0;
   }
 
+  &__icon {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin-right: 16px;
+  }
+
+  &__label {
+    padding: 16px 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__nsfw {
+    color: var(--red);
+  }
+
   .checkmark {
     position: absolute;
-    top: calc(50% - (var(--chekcmark-size) / 2));
-    left: var(--chekcmark-size);
-    height: var(--chekcmark-size);
-    width: var(--chekcmark-size);
+    top: calc(50% - (var(--checkmark-size) / 2));
+    right: var(--checkmark-size);
+    height: var(--checkmark-size);
+    width: var(--checkmark-size);
     background-color: var(--light-gray);
     border-radius: 50%;
 

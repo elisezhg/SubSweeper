@@ -1,4 +1,4 @@
-import { SUBREDDITS_PAGE_SIZE } from '@utils/constants';
+import { SUBSCRIPTIONS_PAGE_SIZE } from '@utils/constants';
 import axios from 'axios';
 
 export async function getToken(code: string) {
@@ -13,17 +13,17 @@ export async function getToken(code: string) {
   return data.data;
 }
 
-export async function getSubreddits() {
+export async function getSubscriptions() {
   let seen = 0;
   let after = null;
-  let subreddits: any[] = [];
+  let subscriptions: any[] = [];
 
   do {
     const res = (await axios.get(
       `${import.meta.env.VITE_REDDIT_API_BASE_URL}/subreddits/mine/subscriber`,
       {
         params: {
-          limit: SUBREDDITS_PAGE_SIZE,
+          limit: SUBSCRIPTIONS_PAGE_SIZE,
           count: seen,
           after: after,
         },
@@ -35,10 +35,10 @@ export async function getSubreddits() {
 
     after = res.data.data.after;
     seen += res.data.data.children.length;
-    subreddits = subreddits.concat(res.data.data.children);
+    subscriptions = subscriptions.concat(res.data.data.children);
   } while (after);
 
-  return Promise.resolve(subreddits);
+  return Promise.resolve(subscriptions);
 }
 
 export async function postUnsubscribe(subFullNames: string[]) {

@@ -6,9 +6,9 @@ import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
 import { useAlerts } from '@contexts/AlertsContext';
 import useInterceptors from '@hooks/useInterceptors';
 import useLoggedIn from '@hooks/useLoggedIn';
-import useSubreddits, { Subreddit } from '@hooks/useSubreddits';
+import useSubscriptions, { Subscription } from '@hooks/useSubscriptions';
 import { getToken, postUnsubscribe } from '@providers/api';
-import { SUBREDDITS_PAGE_SIZE } from '@utils/constants';
+import { SUBSCRIPTIONS_PAGE_SIZE } from '@utils/constants';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './SubManager.scss';
@@ -22,23 +22,27 @@ export default function SubManager() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
-  const [selectedSubreddits, setSelectedSubreddits] = useState([] as string[]);
+  const [selectedSubscriptions, setSelectedSubscriptions] = useState(
+    [] as string[]
+  );
   const [pageNumber, setPageNumber] = useState(0);
 
   const { pushSuccessAlert, pushErrorAlert } = useAlerts();
 
-  const { isSubredditsLoading, subreddits, setAndCacheSubreddits } =
-    useSubreddits(isLoading);
+  const { isSubscriptionsLoading, subscriptions, setAndCacheSubscriptions } =
+    useSubscriptions(isLoading);
 
   const lowerBound = 0;
-  const upperBound = Math.ceil(subreddits.length / SUBREDDITS_PAGE_SIZE - 1);
+  const upperBound = Math.ceil(
+    subscriptions.length / SUBSCRIPTIONS_PAGE_SIZE - 1
+  );
 
-  const pageStart = pageNumber * SUBREDDITS_PAGE_SIZE;
-  const pageEnd = (pageNumber + 1) * SUBREDDITS_PAGE_SIZE - 1;
+  const pageStart = pageNumber * SUBSCRIPTIONS_PAGE_SIZE;
+  const pageEnd = (pageNumber + 1) * SUBSCRIPTIONS_PAGE_SIZE - 1;
 
-  const visibleSubreddits = useMemo(
-    () => subreddits?.slice(pageStart, pageEnd + 1),
-    [subreddits, pageNumber]
+  const visibleSubscriptions = useMemo(
+    () => subscriptions?.slice(pageStart, pageEnd + 1),
+    [subscriptions, pageNumber]
   );
 
   useEffect(() => {
@@ -71,20 +75,21 @@ export default function SubManager() {
   }, [isLoggedIn]);
 
   const handleSelectVisible = () => {
-    setSelectedSubreddits((prevSelectedSubreddits) => [
-      ...prevSelectedSubreddits,
-      ...visibleSubreddits
+    setSelectedSubscriptions((prevSelectedSubscriptions) => [
+      ...prevSelectedSubscriptions,
+      ...visibleSubscriptions
         .filter(
-          (s: Subreddit) => prevSelectedSubreddits.indexOf(s.fullName) === -1
+          (s: Subscription) =>
+            prevSelectedSubscriptions.indexOf(s.fullName) === -1
         )
         .map((s) => s.fullName),
     ]);
   };
 
   const handleUnselectVisible = () => {
-    const toBeRemoved = visibleSubreddits.map((s) => s.fullName);
-    setSelectedSubreddits((prevSelectedSubreddits) =>
-      prevSelectedSubreddits.filter(
+    const toBeRemoved = visibleSubscriptions.map((s) => s.fullName);
+    setSelectedSubscriptions((prevSelectedSubscriptions) =>
+      prevSelectedSubscriptions.filter(
         (s: string) => toBeRemoved.indexOf(s) === -1
       )
     );
@@ -93,26 +98,27 @@ export default function SubManager() {
   const handleUnsubscribe = () => {
     setIsUnsubscribing(true);
 
-    postUnsubscribe(selectedSubreddits)
+    postUnsubscribe(selectedSubscriptions)
       .then(() => {
         setIsUnsubscribing(false);
 
-        const updatedSubreddits = subreddits.filter(
-          (sub) => selectedSubreddits.indexOf(sub.fullName) === -1
+        const updatedSubscriptions = subscriptions.filter(
+          (sub) => selectedSubscriptions.indexOf(sub.fullName) === -1
         );
-        setAndCacheSubreddits(updatedSubreddits);
-        setSelectedSubreddits([]);
+        setAndCacheSubscriptions(updatedSubscriptions);
+        setSelectedSubscriptions([]);
 
         // Decrease page number if needed
-        const totalPages = updatedSubreddits.length / SUBREDDITS_PAGE_SIZE;
+        const totalPages =
+          updatedSubscriptions.length / SUBSCRIPTIONS_PAGE_SIZE;
         if (pageNumber >= totalPages) {
           setPageNumber(pageNumber - 1);
         }
 
         pushSuccessAlert(
           `Successfully unsubscribed from ${
-            selectedSubreddits.length
-          } subreddit${selectedSubreddits.length > 1 ? 's' : ''}.`
+            selectedSubscriptions.length
+          } subscription${selectedSubscriptions.length > 1 ? 's' : ''}.`
         );
       })
       .catch((err) => {
@@ -136,9 +142,9 @@ export default function SubManager() {
   const handleCheckboxChange = (e: React.BaseSyntheticEvent) => {
     const { checked, value } = e.target;
     const updatedSelected = checked
-      ? [...selectedSubreddits, value]
-      : selectedSubreddits.filter((s) => s !== value);
-    setSelectedSubreddits(updatedSelected);
+      ? [...selectedSubscriptions, value]
+      : selectedSubscriptions.filter((s) => s !== value);
+    setSelectedSubscriptions(updatedSelected);
   };
 
   return (
@@ -150,18 +156,18 @@ export default function SubManager() {
             <Button onClick={handleUnselectVisible}>Unselect visible</Button>
             <Button
               onClick={handleUnsubscribe}
-              disabled={selectedSubreddits.length == 0 || isUnsubscribing}
+              disabled={selectedSubscriptions.length == 0 || isUnsubscribing}
               loading={isUnsubscribing}
             >
               Unsubscribe
             </Button>
           </div>
 
-          {subreddits?.length > SUBREDDITS_PAGE_SIZE && (
+          {subscriptions?.length > SUBSCRIPTIONS_PAGE_SIZE && (
             <div className='btn-container__pagination'>
               <span>
-                {pageStart + 1}-{Math.min(pageEnd + 1, subreddits.length)} of{' '}
-                {subreddits.length}
+                {pageStart + 1}-{Math.min(pageEnd + 1, subscriptions.length)} of{' '}
+                {subscriptions.length}
               </span>
               <ArrowButton
                 direction='left'
@@ -179,29 +185,31 @@ export default function SubManager() {
 
         <div className='nb-selected'>
           <span>
-            {selectedSubreddits.length} subreddit
-            {selectedSubreddits.length > 1 ? 's' : ''} selected
+            {selectedSubscriptions.length} subscription
+            {selectedSubscriptions.length > 1 ? 's' : ''} selected
           </span>
           <button
             className='nb-selected__reset-btn'
             tabIndex={0}
-            onClick={() => setSelectedSubreddits([])}
+            onClick={() => setSelectedSubscriptions([])}
           >
             Reset
           </button>
         </div>
 
-        <LoadingWrapper isLoading={isSubredditsLoading}>
-          <div className='subreddits-container'>
-            {visibleSubreddits.map((sub: Subreddit, idx: number) => (
+        <LoadingWrapper isLoading={isSubscriptionsLoading}>
+          <div className='subscriptions-container'>
+            {visibleSubscriptions.map((sub: Subscription, idx: number) => (
               <Checkbox
                 key={idx}
-                checked={selectedSubreddits.indexOf(sub.fullName) !== -1}
-                className='subreddits-container__checkbox'
+                checked={selectedSubscriptions.indexOf(sub.fullName) !== -1}
+                className='subscriptions-container__checkbox'
                 id={sub.fullName}
-                name='subreddits'
+                name='subscriptions'
                 value={sub.fullName}
                 label={sub.displayName}
+                icon={sub.icon}
+                isNSFW={sub.isNSFW}
                 onChange={handleCheckboxChange}
               />
             ))}

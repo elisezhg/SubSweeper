@@ -1,1 +1,1 @@
-export const SUBREDDITS_PAGE_SIZE = 100;
+export const SUBSCRIPTIONS_PAGE_SIZE = 100;
