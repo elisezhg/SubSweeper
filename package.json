@@ -1,10 +1,11 @@
 {
   "name": "subsweeper",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "concurrently --kill-others \"cd server && node server.js\" \"vite --host\"",
+    "dev": "vite --host",
+    "dev:server": "concurrently --kill-others \"cd server && node server.js\" \"vite --host\"",
     "build": "tsc && vite build && cp dist/index.html dist/404.html",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
