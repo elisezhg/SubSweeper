@@ -5,6 +5,7 @@ import Checkbox from '@components/checkbox/Checkbox';
 import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
 import { useAlerts } from '@contexts/AlertsContext';
 import useInterceptors from '@hooks/useInterceptors';
+import useLoggedIn from '@hooks/useLoggedIn';
 import useSubreddits, { Subreddit } from '@hooks/useSubreddits';
 import { getToken, postUnsubscribe } from '@providers/api';
 import { SUBREDDITS_PAGE_SIZE } from '@utils/constants';
@@ -15,6 +16,7 @@ import './SubManager.scss';
 export default function SubManager() {
   const [searchParams, _] = useSearchParams();
   const navigate = useNavigate();
+  const { isLoggedIn } = useLoggedIn();
 
   useInterceptors();
 
@@ -43,7 +45,6 @@ export default function SubManager() {
     const paramState = searchParams.get('state');
     const paramCode = searchParams.get('code');
     const storedState = localStorage.getItem('ss-state');
-    const storedToken = localStorage.getItem('ss-token');
 
     if (paramCode) {
       const isStateMissingOrInvalid = !paramState || paramState != storedState;
@@ -54,19 +55,20 @@ export default function SubManager() {
         getToken(paramCode).then((res: any) => {
           if (res.access_token) {
             localStorage.setItem('ss-token', res.access_token);
+            window.dispatchEvent(new Event('storage'));
           }
           setIsLoading(false);
           navigate('/');
         });
       }
     } else {
-      if (!storedToken) {
+      if (!isLoggedIn) {
         navigate('/login');
       } else {
         setIsLoading(false);
       }
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const handleSelectVisible = () => {
     setSelectedSubreddits((prevSelectedSubreddits) => [

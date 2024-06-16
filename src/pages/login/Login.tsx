@@ -1,23 +1,23 @@
 import Button from '@components/button/Button';
+import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
+import useLoggedIn from '@hooks/useLoggedIn';
 import { getRedirectionUrl } from '@utils/redirection';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.scss';
-import LoadingWrapper from '@components/loading-wrapper/LoadingWrapper';
 
 export default function Login() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const { isLoggedIn } = useLoggedIn();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('ss-token');
-
-    if (!storedToken) {
+    if (!isLoggedIn) {
       setIsLoading(false);
     } else {
       navigate('/');
     }
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <LoadingWrapper isLoading={isLoading}>

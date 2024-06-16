@@ -1,4 +1,5 @@
 import AlertsContainer from '@components/alerts-container/AlertsContainer';
+import Header from '@components/header/Header';
 import { AlertsProvider } from '@contexts/AlertsProvider';
 import Login from '@pages/login/Login';
 import SubManager from '@pages/sub-manager/SubManager';
@@ -33,8 +34,8 @@ function App() {
   return (
     <AlertsProvider>
       <AlertsContainer />
+      <Header />
       <div className='main-container'>
-        <h1>SubSweeper</h1>
         <RouterProvider router={router} />
       </div>
     </AlertsProvider>
